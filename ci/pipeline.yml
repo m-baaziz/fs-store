@@ -1,0 +1,25 @@
+resources:
+  - name: source-code
+    type: git
+    icon: github
+    source:
+      uri: git@github.com:m-baaziz/fs-store.git
+      branch: main
+      private_key: ((git.private_key))
+
+jobs:
+  - name: lint-web
+    serial: true
+    plan:
+      - get: source-code
+        trigger: true
+      - task: run-lint-web
+        file: source-code/ci/tasks/lint.yml
+  - name: test-web
+    serial: true
+    plan:
+      - get: source-code
+        passed: [lint]
+        trigger: true
+      - task: run-tests-web
+        file: source-code/ci/tasks/test.yml
