@@ -14,12 +14,12 @@ jobs:
       - get: source-code
         trigger: true
       - task: run-lint-web
-        file: source-code/ci/tasks/lint.yml
+        file: source-code/ci/tasks/lint-web.yml
   - name: test-web
     serial: true
     plan:
       - get: source-code
-        passed: [lint]
+        passed: [lint-web]
         trigger: true
       - task: run-tests-web
-        file: source-code/ci/tasks/test.yml
+        file: source-code/ci/tasks/test-web.yml
