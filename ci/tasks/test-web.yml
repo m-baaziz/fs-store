@@ -16,6 +16,7 @@ run:
     - |
       set -e
 
+      mongod > /dev/null 2>&1 &
       apt update
       apt install curl
       curl -fsSL https://deb.nodesource.com/setup_12.x | bash -
