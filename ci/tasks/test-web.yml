@@ -20,4 +20,5 @@ run:
       echo "NPM Version: $(npm --version)"
       cd source-code/web
       npm install
+      npm run build
       npm test
