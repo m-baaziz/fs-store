@@ -7,13 +7,17 @@ import Document, {
   DocumentInitialProps,
 } from "next/document";
 import { ServerStyleSheets } from "@material-ui/core/styles";
+import theme from "../src/theme";
 
 export default class MyDocument extends Document {
   render(): React.ReactElement {
     return (
       <Html lang="en">
         <Head>
-          <meta name="theme-color" />
+          <meta
+            name="theme-color"
+            content={theme("light").palette.primary.main}
+          />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"

@@ -3,6 +3,7 @@ import { GridFSBucket, ObjectID } from "mongodb";
 import { ServerResponse } from "http";
 
 import { getStorage } from "../lib/connection";
+import { getFile } from "../lib/file";
 
 export async function uploadMiddleware() {
   try {
@@ -17,6 +18,14 @@ export async function downloadMiddleware(id: string, res: ServerResponse) {
     const storage = await getStorage();
     const bucket = new GridFSBucket(storage.db);
     const stream = bucket.openDownloadStream(new ObjectID(id));
+    const file = await getFile(id);
+
+    res.statusCode = 200;
+    res.setHeader("Content-Type", file.contentType);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${file.filename}"`
+    );
     stream.on("error", (err) => {
       if (err.name === "ENOENT") {
         res.statusCode = 404;

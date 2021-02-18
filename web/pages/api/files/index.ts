@@ -1,10 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nextConnect, { NextHandler } from "next-connect";
 import { ClientRequest, ServerResponse } from "http";
+import bodyParser from "body-parser";
 
 import { parseStoreFile, listFiles, deleteFiles } from "../../../src/lib/file";
 import { uploadMiddleware } from "../../../src/middlewares/gridfs";
 import { StoreFile } from "../../../src/types/file";
+import { FILES_ATTACHMENT_KEY } from "../../../src/constants/file";
 
 export const config = {
   api: {
@@ -40,14 +42,16 @@ async function upload(
   next: NextHandler
 ) {
   const middleware = await uploadMiddleware();
-  nextConnect().use(middleware.single("file")).handle(req, res, next);
+  nextConnect()
+    .use(middleware.single(FILES_ATTACHMENT_KEY))
+    .handle(req, res, next);
 }
 
 async function afterUpload(req: ClientRequest, res: ServerResponse) {
   let content = "";
   try {
     res.statusCode = 200;
-    const file: StoreFile = parseStoreFile(req["file"]);
+    const file: StoreFile = parseStoreFile(req[FILES_ATTACHMENT_KEY]);
     res.setHeader("Content-Type", "application/json");
     content = JSON.stringify(file);
   } catch (e) {
@@ -77,6 +81,6 @@ async function deleteFilesHandler(req: NextApiRequest, res: NextApiResponse) {
 
 apiRoute.get(list);
 apiRoute.post(upload, afterUpload);
-apiRoute.delete(deleteFilesHandler);
+apiRoute.delete(bodyParser.json(), deleteFilesHandler);
 
 export default apiRoute;

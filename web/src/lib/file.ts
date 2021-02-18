@@ -14,6 +14,22 @@ export function parseStoreFile(doc: Record<string, unknown>): StoreFile {
   };
 }
 
+export async function getFile(id: string): Promise<StoreFile> {
+  try {
+    const storage = await getStorage();
+    const bucket = new GridFSBucket(storage.db);
+    const docs = await bucket.find({ _id: new ObjectID(id) }).toArray();
+    if (docs.length === 0)
+      return Promise.reject(`${FileError.NOT_FOUND} (${id})`);
+    if (docs.length > 1)
+      return Promise.reject(`${FileError.UNEXPECTED_NUMBER}`);
+    const file: StoreFile = parseStoreFile(docs[0]);
+    return Promise.resolve(file);
+  } catch (e) {
+    return Promise.reject(e);
+  }
+}
+
 export async function listFiles(): Promise<StoreFile[]> {
   try {
     const storage = await getStorage();

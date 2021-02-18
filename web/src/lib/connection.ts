@@ -7,7 +7,9 @@ let storage: GridFsStorage | undefined = undefined;
 export async function getConnection(): Promise<MongoClient> {
   try {
     if (connection) return connection;
-    connection = await MongoClient.connect(process.env["MONGODB_URL"]);
+    connection = await MongoClient.connect(process.env["MONGODB_URL"], {
+      useUnifiedTopology: true,
+    });
     return connection;
   } catch (e) {
     return Promise.reject(e);

@@ -6,7 +6,8 @@ import http from "http";
 import request from "supertest";
 
 import { StoreFile } from "../../src/types/file";
-import { listFiles, deleteFiles } from "../../src/lib/file";
+import { listFiles, getFile, deleteFiles } from "../../src/lib/file";
+import { FILES_ATTACHMENT_KEY } from "../../src/constants/file";
 import { getConnection } from "../../src/lib/connection";
 
 import filesApiRoute from "../../pages/api/files";
@@ -29,7 +30,7 @@ function createTestServer(): http.Server {
   return http.createServer(requestListener);
 }
 
-describe("using mongodb", () => {
+describe("files management", () => {
   let uploadedFiles: StoreFile[] = [];
 
   async function uploadFiles(
@@ -40,7 +41,7 @@ describe("using mongodb", () => {
         .agent(createTestServer())
         .post("/")
         .set({ connection: "keep-alive" })
-        .attach("file", filepath);
+        .attach(FILES_ATTACHMENT_KEY, filepath);
 
       const file = JSON.parse(response.text) as StoreFile;
       uploadedFiles.push(file);
@@ -85,7 +86,7 @@ describe("using mongodb", () => {
     }
   });
 
-  test("list files", async (done) => {
+  test("list", async (done) => {
     const result = await listFiles();
     expect(Array.isArray(result)).toBeTruthy();
     expect(result.length).toEqual(0);
@@ -105,7 +106,21 @@ describe("using mongodb", () => {
     done();
   });
 
-  test("upload file", async (done) => {
+  test("get", async (done) => {
+    const filename = "logo_react.png";
+    const [response, uploadedFile] = await uploadFiles(
+      path.join(ASSETS_DIR, filename)
+    );
+
+    expect(response.status).toEqual(200);
+
+    const filePromise = getFile(uploadedFile.id).then((f) => f.filename);
+    expect(filePromise).resolves.toEqual(filename);
+
+    done();
+  });
+
+  test("upload", async (done) => {
     const filename = "lorem.txt";
     const filepath = path.join(ASSETS_DIR, filename);
     const filesize = fs.statSync(filepath).size;
@@ -118,7 +133,7 @@ describe("using mongodb", () => {
     done();
   });
 
-  test("delete file", async (done) => {
+  test("delete", async (done) => {
     const filename = "random.json";
     const filepath = path.join(ASSETS_DIR, filename);
     const [response, file] = await uploadFiles(filepath);
