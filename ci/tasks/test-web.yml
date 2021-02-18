@@ -3,8 +3,8 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: node
-    tag: "12.5"
+    repository: mongo
+    tag: "4.4.4"
 
 inputs:
   - name: source-code
@@ -16,6 +16,10 @@ run:
     - |
       set -e
 
+      apt update
+      apt install curl
+      curl -fsSL https://deb.nodesource.com/setup_12.x | bash -
+      apt install -y nodejs
       echo "Node Version: $(node --version)"
       echo "NPM Version: $(npm --version)"
       cd source-code/web
