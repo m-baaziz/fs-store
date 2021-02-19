@@ -97,7 +97,7 @@ mod tests {
     impl Default for TestConfig {
         fn default() -> Self {
             Self {
-                api_url: String::from("http://localhost:4000"),
+                api_url: String::from("http://localhost:3000"),
             }
         }
     }

@@ -32,6 +32,7 @@ run:
 
       cd $DIR
 
+      apt install build-essential -y
       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install_rust.sh
       chmod +x install_rust.sh
       ./install_rust.sh -y
