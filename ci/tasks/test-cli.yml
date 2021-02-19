@@ -1,0 +1,36 @@
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: mongo
+    tag: "4.4.4"
+
+inputs:
+  - name: source-code
+
+run:
+  path: /bin/sh
+  args:
+    - -c
+    - |
+      set -e
+
+      DIR=$(pwd)
+
+      mongod > /dev/null 2>&1 &
+      apt update
+      apt install curl
+      curl -fsSL https://deb.nodesource.com/setup_12.x | bash -
+      apt install -y nodejs
+      echo "Node Version: $(node --version)"
+      echo "NPM Version: $(npm --version)"
+      cd source-code/web
+      npm install
+      npm run build
+      npm start > /dev/null 2>&1 &
+
+      cd $DIR
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      cd source-code/cli
+      cargo test

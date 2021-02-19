@@ -23,3 +23,11 @@ jobs:
         trigger: true
       - task: run-tests-web
         file: source-code/ci/tasks/test-web.yml
+  - name: test-cli
+    serial: true
+    plan:
+      - get: source-code
+        passed: [test-web]
+        trigger: true
+      - task: run-tests-cli
+        file: source-code/ci/tasks/test-cli.yml
