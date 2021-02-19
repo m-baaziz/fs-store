@@ -1,34 +1,88 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FS Store
+
+Simple File Storage application using GridFs (MongoDB) as a persistant file storage system.
+This repository is compsed of 3 parts:
+- web server
+- web client
+- CLI client
+
+The web server and client were developped using NextJs Framework (NodeJS + ReactJS) ->
+cf. /web
+
+The cli client was developed in Rust ->
+cf. /cli
+
+
+Continuous Integration runs on Concourse (self hosted Concourse + Vault) -> cf. /ci
+
+## Requirements
+
+Simple use: 
+- Docker & docker-compose
+
+Developement & build:
+- NodeJs (> 12.0)
+- Rust (rustup, cargo )
+- Concourse (+ Vault) for CI
+- Docker & docker-compose for MongoDB and CI
 
 ## Getting Started
 
-First, run the development server:
+```
+docker-compose build --no-cache
 
-```bash
-npm run dev
-# or
-yarn dev
+docker-compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+visit http://localhost:3000 to use the web client
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+to use the CLI tool, connect to the container `cli`, and use `fs-store`:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```
+docker-compose run cli
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+fs-store help
 
-## Learn More
+wget -O image.jpg https://picsum.photos/id/1057/200/300
 
-To learn more about Next.js, take a look at the following resources:
+fs-store --url http://web:3000 upload image.jpg
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+fs-store --url http://web:3000 list
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+fs-store --url http://web:3000 delete [id]
 
-## Deploy on Vercel
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Note: By default, fs-store will try to reach `localhost`. However, while using the docker services, the web server will have `web` as a domain name. So we need to adapt the command using the `--url` option.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Build
+
+For development purposes, here is how to run the stack locally:
+
+web ->
+
+```
+cd web
+
+npm install
+
+npm run build
+
+npm start
+```
+
+cli ->
+
+```
+cd cli
+
+cargo install --path .
+
+./target/release/fs-store delete --help
+
+```
+
+Note: MongoDB is still needed to be started, either with a local mongod server or using the docker-compose.yml provided. MongoDB url can be changed in web/.env file.
+
+In production, the CLI should be built and released for the correct target platform.
+For the purpose of this exercise I prefered to use docker containerization to avoid platform issues.

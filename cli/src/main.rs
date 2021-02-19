@@ -3,8 +3,7 @@ use clap::Clap;
 use std::fs;
 use std::path::PathBuf;
 
-/// This doc string acts as a help message when the user runs '--help'
-/// as do all doc strings on fields
+/// Simple CLI tool to list, upload and delete files on the Server (GridFS [MongoDB])
 #[derive(Clap)]
 #[clap(version = "1.0", author = "Mohamed B. <mhabaaziz@gmail.com>")]
 struct Opts {

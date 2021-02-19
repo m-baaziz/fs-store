@@ -13,3 +13,9 @@ services:
       - mongo
     links:
       - mongo
+  cli:
+    build: ./cli
+    depends_on:
+      - web
+    links:
+      - web
